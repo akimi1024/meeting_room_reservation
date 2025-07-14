@@ -1,21 +1,21 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from app.models import models
-from app.schemas import schemas
+from app.models.booking import Booking
+from app.schemas.booking import Booking as schemas_booking
 
 # 予約一覧取得
 def get_bookings(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Booking).offset(skip).limit(limit).all()
+    return db.query(Booking).offset(skip).limit(limit).all()
 
 # 予約登録
-def create_booking(db: Session, booking: schemas.Booking):
-    db_booked = db.query(models.Booking).\
-          filter(models.Booking.room_id == booking.room_id,
-                models.Booking.start_datetime < booking.end_datetime,
-                models.Booking.end_datetime > booking.start_datetime).all()
+def create_booking(db: Session, booking: schemas_booking):
+    db_booked = db.query(Booking).\
+          filter(Booking.room_id == booking.room_id,
+                Booking.start_datetime < booking.end_datetime,
+                Booking.end_datetime > booking.start_datetime).all()
 
     if len(db_booked) == 0:
-      db_booking = models.Booking(
+      db_booking = Booking(
         user_id=booking.user_id,
         room_id=booking.room_id,
         booked_num=booking.booked_num,

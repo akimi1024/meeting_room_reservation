@@ -1,19 +1,20 @@
-from fastapi import FastAPI, Depends
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import List
 
 from app.db.database import get_db
-from app import crud, schemas
+from app.crud.booking import get_bookings, create_booking
+from app.schemas.booking import Booking, BookingCreate
 
-app = FastAPI()
+router = APIRouter()
 
 # 予約一覧取得
-@app.get("/bookings", response_model=List[schemas.Booking])
+@router.get("/bookings", response_model=List[Booking])
 async def read_bookings(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    bookings = crud.get_bookings(db, skip=skip, limit=limit)
+    bookings = get_bookings(db, skip=skip, limit=limit)
     return bookings
 
 # 予約登録
-@app.post("/bookings", response_model=schemas.Booking)
-async def create_booking(booking: schemas.BookingCreate, db: Session = Depends(get_db)):
-    return crud.create_booking(db=db, booking=booking)
+@router.post("/bookings", response_model=Booking)
+async def create_booking(booking: BookingCreate, db: Session = Depends(get_db)):
+    return create_booking(db=db, booking=booking)

@@ -1,19 +1,20 @@
-from fastapi import FastAPI, Depends
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import List
 
 from app.db.database import get_db
-from app import crud, schemas
+from app.crud.room import get_rooms, create_room
+from app.schemas.room import Room, RoomCreate
 
-app = FastAPI()
+router = APIRouter()
 
 # ルーム一覧取得
-@app.get("/rooms", response_model=List[schemas.Room])
+@router.get("/rooms", response_model=List[Room])
 async def read_rooms(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    rooms = crud.get_rooms(db, skip=skip, limit=limit)
+    rooms = get_rooms(db, skip=skip, limit=limit)
     return rooms
 
 # ルーム登録
-@app.post("/rooms", response_model=schemas.Room)
-async def create_room(room: schemas.RoomCreate, db: Session = Depends(get_db)):
-    return crud.create_room(db=db, room=room)
+@router.post("/rooms", response_model=Room)
+async def create_room(room: RoomCreate, db: Session = Depends(get_db)):
+    return create_room(db=db, room=room)
