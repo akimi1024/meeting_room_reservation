@@ -6,7 +6,7 @@ import pandas as pd
 
 page = st.sidebar.selectbox(
     'menu',
-    ('user', 'rooms', 'bookings')
+    ('user', 'rooms', 'bookings', 'user_info_update')
 )
 
 if page == 'user':
@@ -22,8 +22,6 @@ if page == 'user':
         submit_button = st.form_submit_button(label='送信')
 
         if submit_button:
-            st.write('## 送信データ')
-            st.write('## レスポンス')
             url = 'http://127.0.0.1:8000/api/users'
 
             res = requests.post(
@@ -32,18 +30,9 @@ if page == 'user':
             )
 
             if res.status_code == 200:
-                st.write('### ユーザー登録成功')
                 st.success('ユーザー登録成功')
             else:
-                st.write('### ユーザー登録失敗')
-
-            st.write('## レスポンス')
-            st.write(res.status_code)
-            st.write("生レスポンス:", res.text)
-            st.write('### 送信データ')
-            st.json(user_data)
-
-            st.json(res.json())
+                st.error('ユーザー登録失敗')
 
 elif page == 'rooms':
     st.title('APIテスト画面（ルーム）')
@@ -67,15 +56,10 @@ elif page == 'rooms':
                 data=json.dumps(room_data),
             )
 
-            st.write('### ステータスコード')
-            st.write(res.status_code)
-
             if res.status_code == 200:
-                st.write('### ルーム登録成功')
                 st.success('ルーム登録成功')
             else:
                 st.write('### ルーム登録失敗')
-            st.json(res.json())
 
 elif page == 'bookings':
     st.title('会議室予約画面')
@@ -170,12 +154,47 @@ elif page == 'bookings':
                 )
 
                 if res.status_code == 200:
-                    st.write('### 予約登録成功')
                     st.success('予約登録成功')
                 elif res.status_code == 404:
-                    st.write('### 予約登録失敗')
                     st.error('指定された時間に会議室はすでに予約されています。')
                 else:
-                    st.write('### 予約登録失敗')
-                st.write('### レスポンス')
-                st.json(res.json())
+                    st.error(f'予約登録失敗: {res.text}')
+
+elif page == 'user_info_update':
+    st.title("ユーザー編集フォーム")
+    # ユーザー一覧を取得
+    url_users = 'http://127.0.0.1:8000/api/users'
+    res_user = requests.get(url_users)
+    res_users = res_user.json()
+    user_dict = {user['username']: user['user_id'] for user in res_users}
+
+    # 選択ボックスでユーザーを選択
+    selected_username = st.selectbox("編集するユーザーを選択してください", options=list(user_dict.keys()))
+    selected_user_id = user_dict[selected_username]
+
+    # 選択ユーザーの現在の情報
+    current_username = selected_username
+
+    # 編集フォーム
+    with st.form(key="edit_user_form"):
+        new_username = st.text_input("ユーザー名", value=current_username)
+        submit_button = st.form_submit_button("更新")
+
+        if submit_button:
+            if new_username.strip() == "":
+                st.error("ユーザー名を入力してください")
+            else:
+                update_data = {
+                    "username": new_username
+                }
+                url_update = f'http://127.0.0.1:8000/api/users/{selected_user_id}'
+                res_update = requests.put(
+                    url_update,
+                    data=json.dumps(update_data)
+                )
+
+                if res_update.status_code == 200:
+                    st.success("ユーザー情報が更新されました")
+                else:
+                    st.error(f"ユーザー情報の更新に失敗しました: {res_update.text}")
+                    st.write("レスポンスコード:", res_update.status_code)
