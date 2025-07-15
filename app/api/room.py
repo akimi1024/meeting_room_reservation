@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from app.db.database import get_db
-from app.crud.room import get_rooms, create_room
+from app.crud.room import get_rooms, create_room as create_room_logic
 from app.schemas.room import Room, RoomCreate
 
 router = APIRouter()
@@ -17,4 +17,4 @@ async def read_rooms(skip: int = 0, limit: int = 100, db: Session = Depends(get_
 # ルーム登録
 @router.post("/rooms", response_model=Room)
 async def create_room(room: RoomCreate, db: Session = Depends(get_db)):
-    return create_room(db=db, room=room)
+    return create_room_logic(db=db, room=room)

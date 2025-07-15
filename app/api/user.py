@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from app.db.database import get_db
-from app.crud.user import get_users, create_user
+from app.crud.user import get_users, create_user as create_user_logic
 from app.schemas.user import User, UserCreate
 
 router = APIRouter()
@@ -17,4 +17,4 @@ async def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_
 # ユーザー登録
 @router.post("/users", response_model=User)
 async def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    return create_user(db=db, user=user)
+    return create_user_logic(db=db, user=user)
