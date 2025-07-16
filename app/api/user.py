@@ -25,4 +25,4 @@ async def create_user(user: UserCreate, db: Session = Depends(get_db)):
 @router.put("/users/{user_id}", response_model=User)
 async def update_user(user_id: int, user: UserCreate, db: Session = Depends(get_db)):
     print(f"Updating user with ID: {user_id} and data: {user}")
-    return update_user_logic(db=db, user=user, user_id=user_id)  # Assuming the logic for updating is similar to creating
+    return update_user_logic(db=db, user=user, user_id=user_id)
