@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -6,6 +7,7 @@ from app.db.database import get_db
 from app.crud.user import get_users
 from app.crud.user import create_user as create_user_logic
 from app.crud.user import update_user as update_user_logic
+from app.crud.user import delete_user as delete_user_logic
 from app.schemas.user import User, UserCreate
 
 router = APIRouter()
@@ -26,3 +28,9 @@ async def create_user(user: UserCreate, db: Session = Depends(get_db)):
 async def update_user(user_id: int, user: UserCreate, db: Session = Depends(get_db)):
     print(f"Updating user with ID: {user_id} and data: {user}")
     return update_user_logic(db=db, user=user, user_id=user_id)
+
+# ユーザー削除
+@router.delete("/users/{user_id}")
+async def delete_user(user_id: int, db: Session = Depends(get_db)):
+    deleted_user = delete_user_logic(db=db, user_id=user_id)
+    return JSONResponse(content={"message": f"{deleted_user.username} を削除しました"})

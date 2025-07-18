@@ -161,7 +161,7 @@ elif page == 'bookings':
                     st.error(f'予約登録失敗: {res.text}')
 
 elif page == 'user_info_update':
-    st.title("ユーザー編集フォーム")
+    st.title("ユーザー編集")
     # ユーザー一覧を取得
     url_users = 'http://127.0.0.1:8000/api/users'
     res_user = requests.get(url_users)
@@ -179,6 +179,11 @@ elif page == 'user_info_update':
     with st.form(key="edit_user_form"):
         new_username = st.text_input("ユーザー名", value=current_username)
         submit_button = st.form_submit_button("更新")
+
+    # 削除フォーム
+    with st.form(key="delete_user_form"):
+        st.write("ユーザーを削除する場合は以下のボタンを押してください")
+        delete_button = st.form_submit_button("ユーザー削除")
 
         if submit_button:
             if new_username.strip() == "":
@@ -198,3 +203,14 @@ elif page == 'user_info_update':
                 else:
                     st.error(f"ユーザー情報の更新に失敗しました: {res_update.text}")
                     st.write("レスポンスコード:", res_update.status_code)
+
+        elif delete_button:
+            url_delete = f'http://127.0.0.1:8000/api/users/{selected_user_id}'
+            res_delete = requests.delete(url_delete)
+
+            if res_delete.status_code == 200:
+                message = res_delete.json().get("message")
+                st.success(message)
+            else:
+                st.error(f"ユーザーの削除に失敗しました: {res_delete.text}")
+                st.write("レスポンスコード:", res_delete.status_code)
