@@ -26,3 +26,13 @@ def update_room(db: Session, room: schemas_Room, room_id: int):
     db.commit()
     db.refresh(db_room)
     return db_room
+
+# 会議室削除
+def delete_room(db: Session, room_id: int):
+    db_room = db.query(Room).filter(Room.room_id == room_id).first()
+    if not db_room:
+        raise HTTPException(status_code=404, detail="Room not found")
+    
+    db.delete(db_room)
+    db.commit()
+    return db_room
