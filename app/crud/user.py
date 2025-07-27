@@ -21,6 +21,9 @@ def update_user(db: Session, user: schema_User, user_id: int):
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
 
+    if db.query(User).filter(User.username == user.username, User.user_id != user_id).first():
+        raise HTTPException(status_code=400, detail="User name already in use")
+
     db_user.username = user.username
     db.commit()
     db.refresh(db_user)

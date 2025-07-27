@@ -21,6 +21,9 @@ def update_room(db: Session, room: schemas_Room, room_id: int):
     if not db_room:
         raise HTTPException(status_code=404, detail="Room not found")
 
+    if db.query(Room).filter(Room.room_name == room.room_name, Room.room_id != room_id).first():
+        raise HTTPException(status_code=400, detail="Room name already in use")
+
     db_room.room_name = room.room_name
     db_room.capacity = room.capacity
     db.commit()
@@ -32,7 +35,7 @@ def delete_room(db: Session, room_id: int):
     db_room = db.query(Room).filter(Room.room_id == room_id).first()
     if not db_room:
         raise HTTPException(status_code=404, detail="Room not found")
-    
+
     db.delete(db_room)
     db.commit()
     return db_room
