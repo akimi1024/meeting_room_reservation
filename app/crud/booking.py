@@ -31,3 +31,29 @@ def create_booking(db: Session, booking: schemas_booking):
             status_code=404,
             detail="The room is already booked for the selected time."
         )
+
+# 予約更新
+def update_booking(db: Session, booking: schemas_booking, booking_id: int):
+    db_booking = db.query(Booking).filter(Booking.booking_id == booking_id).first()
+    if not db_booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+
+    conflict_booking = db.query(Booking).filter(
+                        Booking.room_id == booking.room_id,
+                        Booking.booking_id != booking_id,
+                        Booking.start_datetime < booking.end_datetime,
+                        Booking.end_datetime > booking.start_datetime
+                        ).first()
+    if conflict_booking:
+      raise HTTPException(status_code=404, detail="The meeting room is already reserved at the specified time")
+
+    db_booking.user_id = booking.user_id
+    db_booking.room_id = booking.room_id
+    db_booking.booked_num = booking.booked_num
+    db_booking.start_datetime = booking.start_datetime
+    db_booking.end_datetime = booking.end_datetime
+
+    db.commit()
+    db.refresh(db_booking)
+
+    return db_booking
