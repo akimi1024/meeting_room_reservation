@@ -57,3 +57,12 @@ def update_booking(db: Session, booking: schemas_booking, booking_id: int):
     db.refresh(db_booking)
 
     return db_booking
+
+def delete_booking(db: Session, booking_id: int):
+    db_booking = db.query(Booking).filter(Booking.booking_id == booking_id).first()
+    if not db_booking:
+        raise HTTPException(status_code=404, detail="booking not found")
+
+    db.delete(db_booking)
+    db.commit()
+    return db_booking
