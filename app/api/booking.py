@@ -1,10 +1,13 @@
 from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from typing import List
 
 from app.db.database import get_db
-from app.crud.booking import get_bookings, create_booking as create_booking_logic
+from app.crud.booking import get_bookings
+from app.crud.booking import create_booking as create_booking_logic
 from app.crud.booking import update_booking as update_booking_logic
+from app.crud.booking import delete_booking as delete_booking_logic
 from app.schemas.booking import Booking, BookingCreate
 
 router = APIRouter()
@@ -25,3 +28,9 @@ async def create_booking(booking: BookingCreate, db: Session = Depends(get_db)):
 async def update_booking(booking_id: int, booking: BookingCreate, db: Session=Depends(get_db)):
     print(f"Updating Booking with ID: {booking_id} and data: {booking}")
     return update_booking_logic(db=db, booking=booking, booking_id=booking_id)
+
+# 予約削除
+@router.delete("/bookings/{booking_id}")
+async def delete_booking(booking_id: int, db: Session=Depends(get_db)):
+    delete_booking = delete_booking_logic(db=db, booking_id=booking_id)
+    return JSONResponse(content={"message": f"{delete_booking.booking_id}を削除しました"})
