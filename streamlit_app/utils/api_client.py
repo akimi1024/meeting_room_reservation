@@ -40,8 +40,12 @@ def get(endpoint):
 def post(endpoint, data):
     return _request("POST", endpoint, data)
 
-def put(endpoint, data):
-    return _request("PUT", endpoint, data)
+def put(endpoint, data, resource_id=None):
+    """PUTメソッド (IDありでもOK)"""
+    url = f"{endpoint}/{resource_id}" if resource_id else endpoint
+    return _request("PUT", url, data)
 
-def delete(endpoint):
-    return _request("DELETE", endpoint)
+def delete(endpoint, resource_id=None):
+    """DELETEメソッド (IDありでもOK)"""
+    url = f"{endpoint}/{resource_id}" if resource_id else endpoint
+    return _request("DELETE", url)

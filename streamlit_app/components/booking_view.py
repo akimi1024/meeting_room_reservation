@@ -16,19 +16,18 @@ def booking_render():
 
     # 会議室一覧表示
     st.write('### 会議室一覧')
-    rooms_data = rooms["data"]
-    df_rooms = pd.DataFrame(rooms_data)
+    df_rooms = pd.DataFrame(rooms)
     df_rooms.columns = ['会議室名', '定員', 'ID']
     st.table(df_rooms)
 
     # 予約一覧表示
-    df_bookings = helpers.booking_df_transform(bookings["data"], users, rooms["data"])
+    df_bookings = helpers.booking_df_transform(bookings, users, rooms)
     st.table(df_bookings)
 
     # 予約フォーム
     with st.form(key='bookings'):
         user = components.select_user(users, "予約者名")
-        room = components.select_room(rooms["data"], "会議室名")
+        room = components.select_room(rooms, "会議室名")
         booked_num = st.number_input('予約人数', step=1, min_value=1)
         date = st.date_input('予約日', min_value=datetime.date.today())
         start_time = st.time_input('開始時間', value=datetime.time(9, 0))
