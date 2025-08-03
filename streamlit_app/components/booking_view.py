@@ -1,6 +1,4 @@
 import streamlit as st
-import requests
-import json
 import datetime
 import pandas as pd
 from utils import api_client, helpers, components
@@ -9,33 +7,27 @@ from utils import api_client, helpers, components
 def booking_render():
     st.title('会議室予約')
     # ユーザー一覧を取得
-    users = api_client.get("users")
+    users = helpers.fetch_list("users")
     # 会議室一覧を取得
-    rooms = api_client.get("rooms")
+    rooms = helpers.fetch_list("rooms")
     # 予約一覧を取得
-    bookings = api_client.get("bookings")
+    bookings = helpers.fetch_list("bookings")
 
 
     # 会議室一覧表示
     st.write('### 会議室一覧')
-    if rooms["status_code"] == 200:
-        rooms_data = rooms["data"]
-        df_rooms = pd.DataFrame(rooms_data)
-        df_rooms.columns = ['会議室名', '定員', 'ID']
-        st.table(df_rooms)
-    else:
-        st.error("会議室一覧の取得に失敗しました")
+    rooms_data = rooms["data"]
+    df_rooms = pd.DataFrame(rooms_data)
+    df_rooms.columns = ['会議室名', '定員', 'ID']
+    st.table(df_rooms)
 
     # 予約一覧表示
-    if bookings["status_code"] == 200:
-        df_bookings = helpers.booking_df_transform(bookings["data"], users["data"], rooms["data"])
-        st.table(df_bookings)
-    else:
-        st.info("予約データがありません")
+    df_bookings = helpers.booking_df_transform(bookings["data"], users, rooms["data"])
+    st.table(df_bookings)
 
     # 予約フォーム
     with st.form(key='bookings'):
-        user = components.select_user(users["data"], "予約者名")
+        user = components.select_user(users, "予約者名")
         room = components.select_room(rooms["data"], "会議室名")
         booked_num = st.number_input('予約人数', step=1, min_value=1)
         date = st.date_input('予約日', min_value=datetime.date.today())
@@ -64,33 +56,31 @@ def booking_render():
 def booking_info_update_render():
     st.title("予約編集")
 
-    # --- API からデータ取得 ---
-    bookings = api_client.get("bookings")
-    users = api_client.get("users")
-    rooms = api_client.get("rooms")
-
-    if bookings["status_code"] != 200:
-        st.info("登録されている予約がありません。")
-        return
+    # ユーザー一覧を取得
+    users = helpers.fetch_list("users")
+    # 会議室一覧を取得
+    rooms = helpers.fetch_list("rooms")
+    # 予約一覧を取得
+    bookings = helpers.fetch_list("bookings")
 
     # --- 辞書化 ---
-    user_dict = {user['username']: user['user_id'] for user in users["data"]}
-    room_dict = {room['room_name']: room['room_id'] for room in rooms["data"]}
+    user_dict = {user['username']: user['user_id'] for user in users}
+    room_dict = {room['room_name']: room['room_id'] for room in rooms}
 
     # --- booking_idと表示用テキストをマッピング ---
     booking_options = {
         f"{b['booking_id']}: {b['user_id']} - {b['room_id']} - {b['start_datetime']}": b['booking_id']
-        for b in bookings["data"]
+        for b in bookings
     }
 
     # --- 編集対象の予約を選択 ---
     selected_booking_label = st.selectbox("編集する予約を選択", list(booking_options.keys()))
     selected_booking_id = booking_options[selected_booking_label]
-    current_booking = next(b for b in bookings["data"] if b["booking_id"] == selected_booking_id)
+    current_booking = next(b for b in bookings if b["booking_id"] == selected_booking_id)
 
     # --- 現在の予約情報を展開 ---
-    current_user = next(u["username"] for u in users["data"] if u["user_id"] == current_booking["user_id"])
-    current_room = next(r["room_name"] for r in rooms["data"] if r["room_id"] == current_booking["room_id"])
+    current_user = next(u["username"] for u in users if u["user_id"] == current_booking["user_id"])
+    current_room = next(r["room_name"] for r in rooms if r["room_id"] == current_booking["room_id"])
     current_start = datetime.datetime.fromisoformat(current_booking["start_datetime"])
     current_end = datetime.datetime.fromisoformat(current_booking["end_datetime"])
 
@@ -121,7 +111,7 @@ def booking_info_update_render():
     if update_button:
         user_id = user_dict[new_user_name]
         room_id = room_dict[new_room_name]
-        capacity = next(r["capacity"] for r in rooms["data"] if r["room_id"] == room_id)
+        capacity = next(r["capacity"] for r in rooms if r["room_id"] == room_id)
 
         if new_booked_num > capacity:
             st.error(f'予約人数が会議室の定員({capacity})を超えています。')

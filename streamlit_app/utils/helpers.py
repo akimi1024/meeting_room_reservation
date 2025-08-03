@@ -1,5 +1,7 @@
+import streamlit as st
 import datetime
 import pandas as pd
+from utils import api_client
 
 def build_user_dict(users):
     return {user['username']: user['user_id'] for user in users}
@@ -30,3 +32,29 @@ def booking_df_transform(bookings, users, rooms):
         'end_datetime': '終了日時',
         'booking_id': '予約ID'
     })
+
+def fetch_list(endpoint):
+    if endpoint == "users":
+        not_found_msg = "登録されているユーザー情報がありません"
+        error_msg = "ユーザー一覧の取得に失敗しました"
+    elif endpoint == "rooms":
+        not_found_msg = "登録されている会議室がありません"
+        error_msg = "会議室一覧の取得に失敗しました"
+    elif endpoint == "booking":
+        not_found_msg = "登録されている予約がありません"
+        error_msg = "予約一覧の取得に失敗しました"
+
+    """一覧データ取得の共通処理"""
+    res = api_client.get(endpoint)
+    if res["status_code"] == 200:
+        if res["data"]:
+            return res["data"]
+        else:
+            st.info(not_found_msg)
+            return []
+    elif res["status_code"] == 404:
+        st.info(not_found_msg)
+        return []
+    else:
+        st.error(f"{error_msg}: {res['error']}")
+        return []
