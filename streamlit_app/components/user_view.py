@@ -4,10 +4,8 @@ from utils import api_client, helpers, components
 def user_registration_render():
     st.title('ユーザー登録')
     with st.form(key='user'):
-        # user_id = random.randint(1, 10)
         username = st.text_input('ユーザー名', max_chars=12)
         user_data = {
-            # 'user_id': user_id,
             'username': username
         }
 
@@ -25,6 +23,9 @@ def user_info_update_render():
     st.title("ユーザー編集")
     # ユーザー一覧を取得
     res_users = helpers.fetch_list("users")
+
+    if not res_users:
+        return
 
     # 選択ボックスでユーザーを選択
     selected_user = components.select_user(res_users)
@@ -55,3 +56,4 @@ def user_info_update_render():
         if delete_button:
             res_delete = api_client.delete("users", selected_user["user_id"])
             components.api_result_message(res_delete, success_msg="削除しました", fail_msg="削除に失敗しました")
+            st.rerun()

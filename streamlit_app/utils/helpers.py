@@ -8,13 +8,17 @@ def format_datetime(iso_str):
 
 def booking_df_transform(bookings, users, rooms):
     """予約データをUI表示用に変換"""
+    if not bookings:
+        st.info("予約データが存在しません。")
+        return pd.DataFrame()  # 空のDataFrameを返す
+
     df = pd.DataFrame(bookings)
 
     users_id = {u['user_id']: u['username'] for u in users}
     rooms_id = {r['room_id']: {'room_name': r['room_name'], 'capacity': r['capacity']} for r in rooms}
 
-    df['user_id'] = df['user_id'].map(lambda x: users_id[x])
-    df['room_id'] = df['room_id'].map(lambda x: rooms_id[x]['room_name'])
+    df['user_id'] = df['user_id'].map(lambda x: users_id.get(x, "不明ユーザー"))
+    df['room_id'] = df['room_id'].map(lambda x: rooms_id.get(x, {}).get('room_name', "不明会議室"))
     df['start_datetime'] = df['start_datetime'].map(format_datetime)
     df['end_datetime'] = df['end_datetime'].map(format_datetime)
 
@@ -27,6 +31,7 @@ def booking_df_transform(bookings, users, rooms):
         'booking_id': '予約ID'
     })
 
+
 def fetch_list(endpoint):
     if endpoint == "users":
         not_found_msg = "登録されているユーザー情報がありません"
@@ -34,7 +39,7 @@ def fetch_list(endpoint):
     elif endpoint == "rooms":
         not_found_msg = "登録されている会議室がありません"
         error_msg = "会議室一覧の取得に失敗しました"
-    elif endpoint == "booking":
+    elif endpoint == "bookings":
         not_found_msg = "登録されている予約がありません"
         error_msg = "予約一覧の取得に失敗しました"
 
