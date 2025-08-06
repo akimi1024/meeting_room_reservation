@@ -8,11 +8,16 @@ def booking_render():
     st.title('会議室予約')
     # ユーザー一覧を取得
     users = helpers.fetch_list("users")
+    if not users:
+        return
+
     # 会議室一覧を取得
     rooms = helpers.fetch_list("rooms")
+    if not rooms:
+        return
+
     # 予約一覧を取得
     bookings = helpers.fetch_list("bookings")
-
 
     # 会議室一覧表示
     st.write('### 会議室一覧')
@@ -57,10 +62,18 @@ def booking_info_update_render():
 
     # ユーザー一覧を取得
     users = helpers.fetch_list("users")
+    if not users:
+        return
+
     # 会議室一覧を取得
     rooms = helpers.fetch_list("rooms")
+    if rooms:
+        return
+
     # 予約一覧を取得
     bookings = helpers.fetch_list("bookings")
+    if not bookings:
+        return
 
     # --- 辞書化 ---
     user_dict = {user['username']: user['user_id'] for user in users}
@@ -68,16 +81,14 @@ def booking_info_update_render():
 
     # --- booking_idと表示用テキストをマッピング ---
     booking_options = {
-        f"{b['booking_id']}: {b['user_id']} - {b['room_id']} - {b['start_datetime']}": b['booking_id']
+        f"{b['booking_id']}: {next(u['username'] for u in users if u['user_id'] == b['user_id'])} - "
+        f"{next(r['room_name'] for r in rooms if r['room_id'] == b['room_id'])} - {b['start_datetime']}": b['booking_id']
         for b in bookings
     }
 
-    # --- 編集対象の予約を選択 ---
-    selected_booking_label = st.selectbox("編集する予約を選択", list(booking_options.keys()))
-    selected_booking_id = booking_options[selected_booking_label]
-    current_booking = next(b for b in bookings if b["booking_id"] == selected_booking_id)
+    current_booking = components.select_booking(bookings, users, rooms)
 
-    # --- 現在の予約情報を展開 ---
+    # 必要な情報だけ取り出す
     current_user = next(u["username"] for u in users if u["user_id"] == current_booking["user_id"])
     current_room = next(r["room_name"] for r in rooms if r["room_id"] == current_booking["room_id"])
     current_start = datetime.datetime.fromisoformat(current_booking["start_datetime"])
@@ -124,10 +135,11 @@ def booking_info_update_render():
                 "start_datetime": datetime.datetime.combine(new_date, new_start_time).isoformat(),
                 "end_datetime": datetime.datetime.combine(new_date, new_end_time).isoformat()
             }
-            response = api_client.put(f"bookings/{selected_booking_id}", update_data)
+            response = api_client.put(f"bookings/{current_booking["booking_id"]}", update_data)
             components.api_result_message(response, "予約情報を更新しました", "予約の更新に失敗しました")
 
     # --- 削除処理 ---
     if delete_button:
-        response = api_client.delete(f"bookings/{selected_booking_id}")
+        response = api_client.delete(f"bookings/{current_booking["booking_id"]}")
         components.api_result_message(response, "予約を削除しました", "予約の削除に失敗しました")
+        st.rerun()

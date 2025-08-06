@@ -28,6 +28,9 @@ def room_info_update_render():
     # 会議室一覧を取得
     rooms = helpers.fetch_list("rooms")
 
+    if not rooms:
+        return
+
     selected_room = components.select_room(rooms, label="編集する会議室を選択")
 
     with st.form(key="edit_room_form"):
@@ -55,3 +58,4 @@ def room_info_update_render():
     if delete_button:
         res_delete = api_client.delete("rooms", selected_room["room_id"])
         components.api_result_message(res_delete, success_msg="削除しました", fail_msg="削除に失敗しました")
+        st.rerun()
