@@ -108,9 +108,7 @@ def booking_info_update_render():
 
     # --- 更新処理 ---
     if update_button:
-        user_id = user_dict[new_user_name]
-        room_id = room_dict[new_room_name]
-        capacity = next(r["capacity"] for r in rooms if r["room_id"] == room_id)
+        capacity = next(r["capacity"] for r in rooms if r["room_id"] == room_dict[new_room_name])
 
         if new_booked_num > capacity:
             st.error(f'予約人数が会議室の定員({capacity})を超えています。')
@@ -120,24 +118,16 @@ def booking_info_update_render():
             st.error('予約時間は9:00から20:00の間でなければなりません。')
         else:
             update_data = {
-                "user_id": user_id,
-                "room_id": room_id,
+                "user_id": user_dict[new_user_name],
+                "room_id": room_dict[new_room_name],
                 "booked_num": new_booked_num,
                 "start_datetime": datetime.datetime.combine(new_date, new_start_time).isoformat(),
                 "end_datetime": datetime.datetime.combine(new_date, new_end_time).isoformat()
             }
             response = api_client.put(f"bookings/{selected_booking_id}", update_data)
-
-            if response:
-                st.success("予約情報を更新しました")
-            else:
-                st.error("予約の更新に失敗しました")
+            components.api_result_message(response, "予約情報を更新しました", "予約の更新に失敗しました")
 
     # --- 削除処理 ---
     if delete_button:
         response = api_client.delete(f"bookings/{selected_booking_id}")
-        if response:
-            message = response.get("message", "予約を削除しました")
-            st.success(message)
-        else:
-            st.error("予約の削除に失敗しました")
+        components.api_result_message(response, "予約を削除しました", "予約の削除に失敗しました")
