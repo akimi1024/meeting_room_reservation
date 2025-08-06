@@ -3,12 +3,6 @@ import datetime
 import pandas as pd
 from utils import api_client
 
-def build_user_dict(users):
-    return {user['username']: user['user_id'] for user in users}
-
-def build_room_dict(rooms):
-    return {room['room_name']: {'room_id': room['room_id'], 'capacity': room['capacity']} for room in rooms}
-
 def format_datetime(iso_str):
     return datetime.datetime.fromisoformat(iso_str).strftime('%Y/%m/%d %H:%M')
 
