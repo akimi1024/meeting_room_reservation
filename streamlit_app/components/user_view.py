@@ -5,8 +5,10 @@ def user_registration_render():
     st.title('ユーザー登録')
     with st.form(key='user'):
         username = st.text_input('ユーザー名', max_chars=12)
+        admin_button = st.checkbox(label='管理者ユーザー')
         user_data = {
-            'username': username
+            'username': username,
+            'is_admin': admin_button
         }
 
         submit_button = st.form_submit_button(label='送信')

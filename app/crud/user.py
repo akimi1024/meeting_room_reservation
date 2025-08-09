@@ -9,7 +9,7 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
 
 # ユーザー登録
 def create_user(db: Session, user: schema_User):
-    db_user = User(username=user.username)
+    db_user = User(username=user.username, is_admin=user.is_admin)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
