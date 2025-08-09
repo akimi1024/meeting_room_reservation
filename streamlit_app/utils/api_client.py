@@ -9,6 +9,7 @@ def _request(method, endpoint, data=None):
         if method == "GET":
             res = requests.get(url)
         elif method == "POST":
+            print(data)
             res = requests.post(url, json=data)
         elif method == "PUT":
             res = requests.put(url, json=data)

@@ -5,7 +5,6 @@ from utils import api_client, helpers, components
 
 
 def booking_render():
-    st.title('会議室予約')
     # ユーザー一覧を取得
     users = helpers.fetch_list("users")
     if not users:
@@ -58,8 +57,6 @@ def booking_render():
 
 
 def booking_info_update_render():
-    st.title("予約編集")
-
     # ユーザー一覧を取得
     users = helpers.fetch_list("users")
     if not users:
@@ -67,7 +64,7 @@ def booking_info_update_render():
 
     # 会議室一覧を取得
     rooms = helpers.fetch_list("rooms")
-    if rooms:
+    if not rooms:
         return
 
     # 予約一覧を取得

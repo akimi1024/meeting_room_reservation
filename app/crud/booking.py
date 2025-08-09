@@ -10,22 +10,22 @@ def get_bookings(db: Session, skip: int = 0, limit: int = 100):
 # 予約登録
 def create_booking(db: Session, booking: schemas_booking):
     db_booked = db.query(Booking).\
-          filter(Booking.room_id == booking.room_id,
+            filter(Booking.room_id == booking.room_id,
                 Booking.start_datetime < booking.end_datetime,
                 Booking.end_datetime > booking.start_datetime).all()
 
     if len(db_booked) == 0:
-      db_booking = Booking(
-        user_id=booking.user_id,
-        room_id=booking.room_id,
-        booked_num=booking.booked_num,
-        start_datetime=booking.start_datetime,
-        end_datetime=booking.end_datetime
-      )
-      db.add(db_booking)
-      db.commit()
-      db.refresh(db_booking)
-      return db_booking
+        db_booking = Booking(
+            user_id=booking.user_id,
+            room_id=booking.room_id,
+            booked_num=booking.booked_num,
+            start_datetime=booking.start_datetime,
+            end_datetime=booking.end_datetime
+        )
+        db.add(db_booking)
+        db.commit()
+        db.refresh(db_booking)
+        return db_booking
     else:
         raise HTTPException(
             status_code=404,
@@ -45,7 +45,7 @@ def update_booking(db: Session, booking: schemas_booking, booking_id: int):
                         Booking.end_datetime > booking.start_datetime
                         ).first()
     if conflict_booking:
-      raise HTTPException(status_code=404, detail="The meeting room is already reserved at the specified time")
+        raise HTTPException(status_code=404, detail="The meeting room is already reserved at the specified time")
 
     db_booking.user_id = booking.user_id
     db_booking.room_id = booking.room_id

@@ -1,26 +1,41 @@
 import streamlit as st
+from components import login, header, booking_view, user_view, room_view
 
-from components import user_view, room_view, booking_view
+def main():
+    if "token" not in st.session_state:
+        login.login_form()
+    else:
+        # 共通メニュー
+        menu = ["予約登録", "予約管理"]
 
-page = st.sidebar.selectbox(
-    'menu',
-    ('user', 'rooms', 'bookings', 'user_info_update', 'room_info_update', 'booking_info_update')
-)
+        # 管理者だけ追加
+        if st.session_state.get("is_admin", False):
+            menu.extend(["ユーザー登録", "会議室登録", "ユーザー管理", "会議室管理"])
 
-if page == 'user':
-    user_view.user_registration_render()
+        menu.append("ログアウト")
 
-elif page == 'rooms':
-    room_view.room_registration_render()
+        page = st.sidebar.selectbox("ページ選択", menu)
 
-elif page == 'bookings':
-    booking_view.booking_render()
+        if page == "ログアウト":
+            st.session_state.clear()
+            st.rerun()
 
-elif page == 'user_info_update':
-    user_view.user_info_update_render()
+        # 選択ページをヘッダーに表示
+        header.show_header(page)
 
-elif page == 'room_info_update':
-    room_view.room_info_update_render()
+        # ページごとの処理
+        if page == "予約登録":
+            booking_view.booking_render()
+        elif page == "ユーザー登録":
+            user_view.user_registration_render()
+        elif page == "会議室登録":
+            room_view.room_registration_render()
+        elif page == "予約管理":
+            booking_view.booking_info_update_render()
+        elif page == "ユーザー管理":
+            user_view.user_info_update_render()
+        elif page == "会議室管理":
+            room_view.room_info_update_render()
 
-elif page == 'booking_info_update':
-    booking_view.booking_info_update_render()
+if __name__ == "__main__":
+    main()
