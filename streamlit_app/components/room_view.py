@@ -3,7 +3,6 @@ from utils import api_client, helpers, components
 
 
 def room_registration_render():
-    st.title('会議室登録')
     with st.form(key='rooms'):
         room_name = st.text_input('ルーム名', max_chars=12)
         capacity = st.number_input('収容人数', step=1)
@@ -23,8 +22,6 @@ def room_registration_render():
                 st.write('### ルーム登録失敗')
 
 def room_info_update_render():
-    st.title("会議室編集")
-
     # 会議室一覧を取得
     rooms = helpers.fetch_list("rooms")
 

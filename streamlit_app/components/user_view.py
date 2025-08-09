@@ -2,7 +2,6 @@ import streamlit as st
 from utils import api_client, helpers, components
 
 def user_registration_render():
-    st.title('ユーザー登録')
     with st.form(key='user'):
         username = st.text_input('ユーザー名', max_chars=12)
         admin_button = st.checkbox(label='管理者ユーザー')
@@ -22,7 +21,6 @@ def user_registration_render():
                 st.error('ユーザー登録失敗')
 
 def user_info_update_render():
-    st.title("ユーザー編集")
     # ユーザー一覧を取得
     res_users = helpers.fetch_list("users")
 
