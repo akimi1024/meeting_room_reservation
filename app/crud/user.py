@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from app.models.user import User
 from app.schemas.user import User as schema_User
+from app.core.security import get_password_hash
 
 # ユーザー一覧取得
 def get_users(db: Session, skip: int = 0, limit: int = 100):
@@ -9,7 +10,7 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
 
 # ユーザー登録
 def create_user(db: Session, user: schema_User):
-    db_user = User(username=user.username, is_admin=user.is_admin)
+    db_user = User(username=user.username, password_hash=get_password_hash(user.password_hash), is_admin=user.is_admin)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)

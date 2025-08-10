@@ -3,7 +3,7 @@ from components import login, header, booking_view, user_view, room_view
 
 def main():
     if "token" not in st.session_state:
-        login.login_form()
+        login.login_or_signup_form()
     else:
         # 共通メニュー
         menu = ["予約登録", "予約管理"]

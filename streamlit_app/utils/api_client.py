@@ -1,20 +1,27 @@
 import requests
+from streamlit import session_state
 
 BASE_URL = "http://127.0.0.1:8000/api"
+
+def _headers():
+    h = {"Content-Type": "application/json"}
+    token = session_state.get("token")
+    if token:
+        h["Authorization"] = f"Bearer {token}"
+    return h
 
 def _request(method, endpoint, data=None):
     """共通HTTPリクエスト関数"""
     url = f"{BASE_URL}/{endpoint}"
     try:
         if method == "GET":
-            res = requests.get(url)
+            res = requests.get(url, headers=_headers())
         elif method == "POST":
-            print(data)
-            res = requests.post(url, json=data)
+            res = requests.post(url, json=data, headers=_headers())
         elif method == "PUT":
-            res = requests.put(url, json=data)
+            res = requests.put(url, json=data, headers=_headers())
         elif method == "DELETE":
-            res = requests.delete(url)
+            res = requests.delete(url, headers=_headers())
         else:
             return {"status_code": 400, "data": {"error": "Invalid HTTP method"}}
 
