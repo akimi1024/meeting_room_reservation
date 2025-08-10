@@ -8,7 +8,7 @@ from app.core.security import get_password_hash, verify_password, create_access_
 
 def login_user(db: Session, login: Login):
     login_user = db.query(User).filter(User.username == login.username).first()
-    if not login_user or not verify_password(Login.password, login_user.password_hash):
+    if not login_user or not verify_password(login.password, login_user.password_hash):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
     access_token = create_access_token({"sub": str(login_user.user_id), "username": login_user.username, "is_admin": login_user.is_admin})
     return {"access_token": access_token, "token_type": "bearer", "user": login_user}
