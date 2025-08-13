@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from typing import List
@@ -9,6 +9,7 @@ from app.crud.user import create_user as create_user_logic
 from app.crud.user import update_user as update_user_logic
 from app.crud.user import delete_user as delete_user_logic
 from app.schemas.user import User, UserCreate
+from app.schemas.login import Login
 
 router = APIRouter()
 
@@ -26,7 +27,6 @@ async def create_user(user: UserCreate, db: Session = Depends(get_db)):
 # ユーザー情報更新
 @router.put("/users/{user_id}", response_model=User)
 async def update_user(user_id: int, user: UserCreate, db: Session = Depends(get_db)):
-    print(f"Updating user with ID: {user_id} and data: {user}")
     return update_user_logic(db=db, user=user, user_id=user_id)
 
 # ユーザー削除
