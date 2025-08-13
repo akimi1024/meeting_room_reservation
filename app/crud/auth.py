@@ -14,7 +14,6 @@ def login_user(db: Session, login: Login):
     return {"access_token": access_token, "token_type": "bearer", "user": login_user}
 
 def signup_user(db: Session, login: Login):
-    print(login)
     signup_user = db.query(User).filter(User.username == login.username).first()
     if signup_user:
         raise HTTPException(status_code=400, detail="username already registered")

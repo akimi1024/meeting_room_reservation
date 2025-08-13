@@ -4,9 +4,11 @@ from utils import api_client, helpers, components
 def user_registration_render():
     with st.form(key='user'):
         username = st.text_input('ユーザー名', max_chars=12)
+        password = st.text_input("パスワード", type="password")
         admin_button = st.checkbox(label='管理者ユーザー')
         user_data = {
             'username': username,
+            'password_hash': password,
             'is_admin': admin_button
         }
 
@@ -33,13 +35,14 @@ def user_info_update_render():
     # 編集フォーム
     with st.form(key="edit_user_form"):
         new_username = st.text_input("ユーザー名", value=selected_user["username"])
+        new_password = st.text_input("新しいパスワード（変更する場合のみ）", type="password")
+        admin_button = st.checkbox(label='管理者ユーザー', value=selected_user["is_admin"])
+
         col1, col2 = st.columns(2)
-
         with col1:
-                update_button = st.form_submit_button("更新")
-
+            update_button = st.form_submit_button("更新")
         with col2:
-                delete_button = st.form_submit_button("削除")
+            delete_button = st.form_submit_button("削除")
 
         # 更新処理
         if update_button:
@@ -47,10 +50,21 @@ def user_info_update_render():
                 st.error("ユーザー名を入力してください")
             else:
                 update_data = {
-                    "username": new_username
+                    'username': new_username,
+                    'is_admin': admin_button
                 }
-            res_update = api_client.put("users", update_data, selected_user["user_id"])
-            components.api_result_message(res_update, f"{selected_user["username"]}に更新しました", "更新に失敗しました")
+                # パスワードが入力されていれば追加
+                if new_password.strip():
+                    update_data["password_hash"] = new_password
+                else:
+                    update_data["password_hash"] = selected_user["password_hash"]
+
+                res_update = api_client.put("users", update_data, selected_user["user_id"])
+                components.api_result_message(
+                    res_update,
+                    f"{selected_user['username']}に更新しました",
+                    "更新に失敗しました"
+                )
 
         # 削除処理
         if delete_button:
