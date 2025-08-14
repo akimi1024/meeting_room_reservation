@@ -70,4 +70,3 @@ def user_info_update_render():
         if delete_button:
             res_delete = api_client.delete("users", selected_user["user_id"])
             components.api_result_message(res_delete, success_msg="削除しました", fail_msg="削除に失敗しました")
-            st.rerun()
