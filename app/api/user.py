@@ -22,7 +22,7 @@ async def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_
 
 # ユーザー登録
 @router.post("/users", response_model=User)
-async def create_user(user: UserCreate, db: Session = Depends(get_db)):
+async def create_user(user: UserCreate, current_user: User = Depends(admin_required), db: Session = Depends(get_db)):
     return create_user_logic(db=db, user=user)
 
 # ユーザー情報更新
