@@ -35,7 +35,6 @@ def login_or_signup_form():
                 )
 
             if res["status_code"] == 200:
-                st.write(res)
                 # ログイン時・サインアップ時の共通処理
                 token = res["data"]["access_token"]
                 st.session_state["token"] = token
@@ -53,7 +52,6 @@ def login_or_signup_form():
                     # 普通のエラーメッセージ形式
                     st.error(detail)
                 else:
-                    st.write(res)
                     st.error("処理失敗")
 
 
