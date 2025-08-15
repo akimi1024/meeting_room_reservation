@@ -60,9 +60,10 @@ def user_info_update_render():
                     update_data["password_hash"] = selected_user["password_hash"]
 
                 res_update = api_client.put("users", update_data, selected_user["user_id"])
+                st.write(res_update)
                 components.api_result_message(
                     res_update,
-                    f"{selected_user['username']}に更新しました",
+                    f"{res_update['data']['username']}に更新しました",
                     "更新に失敗しました"
                 )
 
