@@ -11,7 +11,6 @@ def _headers():
     return h
 
 def _request(method, endpoint, data=None):
-    """共通HTTPリクエスト関数"""
     url = f"{BASE_URL}/{endpoint}"
     try:
         if method == "GET":
@@ -25,8 +24,13 @@ def _request(method, endpoint, data=None):
         else:
             return {"status_code": 400, "data": {"error": "Invalid HTTP method"}}
 
+        # 共通エラーハンドリング（期限切れなど）
+        if res.status_code == 401:
+            session_state.clear()
+            return {"status_code": 401, "data": {"detail": "認証切れ"}}
+
         try:
-            body = res.json()  # JSONが返る場合
+            body = res.json()
         except ValueError:
             body = {}
 

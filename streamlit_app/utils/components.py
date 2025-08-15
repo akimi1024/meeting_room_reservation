@@ -36,6 +36,7 @@ def api_result_message(res, success_msg="成功しました", fail_msg="失敗�
     """API結果に応じたメッセージ"""
     if res["status_code"] == 200:
         st.success(success_msg)
+        # st.rerun()
     else:
         detail_msg = res["data"].get("detail", "不明なエラー")
         st.error(f"{fail_msg}: {detail_msg}")
