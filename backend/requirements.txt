@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary   # PostgreSQL ドライバ
+alembic           # マイグレーション用
+python-dotenv
+pydantic
+bcrypt==4.0.1
+passlib[bcrypt]
+python-jose

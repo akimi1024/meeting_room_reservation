@@ -29,10 +29,7 @@ def login_or_signup_form():
             if st.session_state["auth_mode"] == "login":
                 res = api_client.post("login", {"username": username, "password": password})
             else:
-                res = api_client.post(
-                    "signup",
-                    {"username": username, "password": password, "is_admin": is_admin}
-                )
+                res = api_client.post("signup", {"username": username, "password": password, "is_admin": is_admin})
 
             if res["status_code"] == 200:
                 # ログイン時・サインアップ時の共通処理

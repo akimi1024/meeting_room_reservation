@@ -1,7 +1,7 @@
 import requests
 from streamlit import session_state
 
-BASE_URL = "http://127.0.0.1:8000/api"
+BASE_URL = "http://backend:8000/api"
 
 def _headers():
     h = {"Content-Type": "application/json"}
@@ -50,6 +50,7 @@ def get(endpoint):
     return _request("GET", endpoint)
 
 def post(endpoint, data):
+    print(f"requestUrl: {endpoint}")
     return _request("POST", endpoint, data)
 
 def put(endpoint, data, resource_id=None):

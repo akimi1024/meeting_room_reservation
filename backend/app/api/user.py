@@ -10,7 +10,7 @@ from app.crud.user import update_user as update_user_logic
 from app.crud.user import delete_user as delete_user_logic
 from app.schemas.user import User, UserCreate
 from app.schemas.login import Login
-from app.core.deps import admin_required, get_current_user
+from app.core.deps import admin_required
 
 router = APIRouter()
 
